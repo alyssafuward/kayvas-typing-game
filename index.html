@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Kayva's Typing Game</title>
 <style>
   :root{
@@ -16,7 +17,9 @@
     margin:0; min-height:100%;
     font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
     background: linear-gradient(180deg, var(--sky) 0%, #BFE9FF 55%, var(--grass) 55%, #7FDB86 100%);
+    overflow-x:hidden;
   }
+  *{ box-sizing:border-box; }
   .sun{
     position:absolute; top:30px; right:40px;
     width:90px; height:90px; border-radius:50%;
@@ -47,6 +50,7 @@
     padding: 26px 40px 34px;
     box-shadow: 0 12px 0 rgba(0,0,0,0.1);
     display:flex; flex-direction:column; align-items:center;
+    width: 100%;
     max-width: 640px;
   }
   .level-heading{
@@ -57,11 +61,16 @@
   }
   .sequence-row{
     display:flex; flex-wrap:wrap; justify-content:center;
-    gap:6px;
-    max-width: 560px;
+    gap:16px;
+    max-width: 100%;
     margin-bottom: 14px;
   }
+  .word-group{
+    display:flex; flex-wrap:nowrap;
+    gap:6px;
+  }
   .seq-box{
+    flex-shrink:0;
     width:36px; height:42px;
     border-radius:10px;
     background:#E5E7EB;
@@ -70,7 +79,6 @@
     font-weight:bold; font-size:1.2rem;
     transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
   }
-  .seq-box.gap-after{ margin-right:16px; }
   .seq-box.correct{ background: var(--grass); color:white; }
   .seq-box.wrong{ background: var(--berry); color:white; }
   .seq-box.current{ transform: scale(1.18); box-shadow: 0 0 0 3px var(--sky); }
@@ -131,11 +139,32 @@
     transform: translateY(4px);
     box-shadow: 0 2px 0 #d9ac1f;
   }
-  .levels{
-    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;
-    max-width: 620px;
-    justify-content:center;
+  .layout{
+    display:flex; align-items:flex-start; justify-content:center;
+    gap:16px;
+    width:100%; max-width: 860px;
   }
+  .sidebar{
+    display:flex; flex-direction:column; gap:16px;
+    background: var(--card);
+    border-radius: 22px;
+    padding:16px;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+    flex-shrink:0;
+  }
+  .part-group{
+    display:flex; flex-direction:column; align-items:stretch;
+    gap:6px;
+  }
+  .part-label{
+    font-size:0.75rem; font-weight:bold;
+    color: var(--ink); opacity:0.7;
+    text-transform:uppercase; letter-spacing:0.5px;
+  }
+  .levels{
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .level-btn{ text-align:left; }
   .level-btn{
     background: white;
     border: 3px solid var(--sky);
@@ -153,7 +182,43 @@
   }
   .keyboard-wrap{
     margin-top: 10px;
+    width: 100%;
   }
+  .keyboard-wrap svg{
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    touch-action: manipulation;
+  }
+  .key-hit{
+    fill: transparent;
+    cursor: pointer;
+  }
+  .touch-keys{
+    display:flex; justify-content:center; align-items:center;
+    gap:20px; flex-wrap:wrap;
+    margin-top:16px;
+  }
+  .touch-keys-group{
+    display:flex; gap:8px;
+  }
+  .touch-key{
+    width:56px; height:56px;
+    min-width:56px; min-height:56px;
+    border-radius:14px;
+    border:3px solid #C7CCD6;
+    background:#EDEFF3;
+    color:var(--ink);
+    font-family:'Comic Sans MS', 'Segoe UI', sans-serif;
+    font-weight:bold; font-size:1.5rem;
+    cursor:pointer;
+    touch-action:manipulation;
+    transition: background 0.1s ease, transform 0.1s ease;
+  }
+  .touch-key:active{ transform:scale(0.92); }
+  .touch-key.active{ background:var(--sun); border-color:#D9AC1F; }
   .key-rect{
     fill: #EDEFF3;
     stroke: #C7CCD6;
@@ -252,6 +317,25 @@
   }
   #repeatBtn{ background:#E5E7EB; color:var(--ink); }
   #nextBtn{ background: var(--grass); color:white; }
+
+  @media (max-width: 760px){
+    .layout{ flex-direction:column; align-items:center; }
+    .sidebar{ width:100%; max-width:600px; }
+    .part-group{ align-items:center; }
+    .levels{ flex-direction:row; flex-wrap:wrap; justify-content:center; }
+    .level-btn{ text-align:center; }
+  }
+
+  @media (max-width: 480px){
+    .title{ font-size:1.5rem; }
+    .card{ padding:18px 14px 22px; border-radius:20px; }
+    .level-heading{ font-size:1rem; }
+    .seq-box{ width:28px; height:34px; font-size:1rem; }
+    .instructions{ font-size:0.9rem; }
+    .score-row{ font-size:0.9rem; gap:18px; }
+    .level-btn{ font-size:0.75rem; padding:6px 10px; }
+    .stage{ padding:14px 10px; }
+  }
 </style>
 </head>
 <body>
@@ -264,21 +348,22 @@
 <div class="stage">
   <div class="title">🌟 Kayva's Typing Game 🌟</div>
 
-  <div class="levels" id="levelBtns"></div>
+  <div class="layout">
+    <aside class="sidebar" id="levelBtns"></aside>
 
-  <div class="card">
-    <div class="level-heading" id="levelHeading">Level 1</div>
-    <div class="sequence-row" id="sequenceRow"></div>
-    <button class="speaker" id="speakerBtn" title="Hear it again">🔊</button>
-    <div class="instructions">Type the highlighted letter!</div>
-    <div class="score-row">
-      <div>Mistakes: <span id="mistakes">0</span></div>
-      <div>Streak: <span id="streak">0</span></div>
-    </div>
-    <div class="feedback" id="feedback"></div>
+    <div class="card">
+      <div class="level-heading" id="levelHeading">Level 1</div>
+      <div class="sequence-row" id="sequenceRow"></div>
+      <button class="speaker" id="speakerBtn" title="Hear it again">🔊</button>
+      <div class="instructions">Type the highlighted letter!</div>
+      <div class="score-row">
+        <div>Mistakes: <span id="mistakes">0</span></div>
+        <div>Streak: <span id="streak">0</span></div>
+      </div>
+      <div class="feedback" id="feedback"></div>
 
-    <div class="keyboard-wrap">
-      <svg viewBox="0 0 640 260" width="600" height="244">
+      <div class="keyboard-wrap">
+      <svg viewBox="0 0 640 260">
         <!-- row 1: top row (decorative) -->
         <g id="row1">
           <rect class="key-rect key-inactive" x="67"  y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="91"  y="50">q</text>
@@ -333,6 +418,16 @@
           <rect class="finger" id="finger-l" x="479" y="72" width="34" height="58" rx="17"/>
           <rect class="finger" x="533" y="72" width="34" height="58" rx="17"/>
         </g>
+        <!-- transparent tap targets, sized to cover both the key and the finger above it, for touchscreens -->
+        <g id="hitboxes">
+          <rect class="key-hit" data-letter="a" x="40"  y="72" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="s" x="94"  y="72" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="d" x="148" y="72" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="f" x="202" y="72" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="j" x="364" y="72" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="k" x="418" y="72" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="l" x="472" y="72" width="48" height="58" rx="12"/>
+        </g>
         <!-- row 3: bottom row (decorative) -->
         <g id="row3">
           <rect class="key-rect key-inactive" x="94"  y="192" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="118" y="222">z</text>
@@ -344,6 +439,21 @@
           <rect class="key-rect key-inactive" x="418" y="192" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="442" y="222">m</text>
         </g>
       </svg>
+    </div>
+
+      <div class="touch-keys" id="touchKeys">
+        <div class="touch-keys-group">
+          <button class="touch-key" data-letter="a">a</button>
+          <button class="touch-key" data-letter="s">s</button>
+          <button class="touch-key" data-letter="d">d</button>
+          <button class="touch-key" data-letter="f">f</button>
+        </div>
+        <div class="touch-keys-group">
+          <button class="touch-key" data-letter="j">j</button>
+          <button class="touch-key" data-letter="k">k</button>
+          <button class="touch-key" data-letter="l">l</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -363,13 +473,27 @@
 </div>
 
 <script>
+  const PARTS = [
+    { label: "Part 1: a s d f" },
+    { label: "Part 2: j k l" }
+  ];
+
   const LEVELS = [
-    { title: "Level 1: a s d f in a row",  type:'blocks', keys:['a','s','d','f'], repeat:4 },
-    { title: "Level 2: a s d f mixed up",  type:'random', keys:['a','s','d','f'], length:16 },
-    { title: "Level 3: asdf words",        type:'words',  words:['dad','sad','fad','add','fads'] },
-    { title: "Level 4: j k l in a row",    type:'blocks', keys:['j','k','l'], repeat:4 },
-    { title: "Level 5: j k l mixed up",    type:'random', keys:['j','k','l'], length:12 },
-    { title: "Level 6: whole home row words", type:'words', words:['salad','flask','falls'] }
+    { title: "Level 1: a s d f in a row",     type:'blocks', keys:['a','s','d','f'], repeat:4, part:0 },
+    { title: "Level 2: a & f",                type:'pair',   letters:['a','f'], wordLen:6, wordCount:4, part:0 },
+    { title: "Level 3: s & d",                type:'pair',   letters:['s','d'], wordLen:6, wordCount:4, part:0 },
+    { title: "Level 4: d & f",                type:'pair',   letters:['d','f'], wordLen:6, wordCount:4, part:0 },
+    { title: "Level 5: a & s",                type:'pair',   letters:['a','s'], wordLen:6, wordCount:4, part:0 },
+    { title: "Level 6: a s d f in triples",   type:'combo',  keys:['a','s','d','f'], comboSize:3, wordCount:4, part:0 },
+    { title: "Level 7: a s d f mixed up",     type:'random', keys:['a','s','d','f'], length:16, part:0 },
+    { title: "Level 8: asdf words",           type:'words',  words:['dad','sad','fad','add','fads'], part:0 },
+    { title: "Level 9: j k l in a row",       type:'blocks', keys:['j','k','l'], repeat:4, part:1 },
+    { title: "Level 10: j & k",               type:'pair',   letters:['j','k'], wordLen:6, wordCount:4, part:1 },
+    { title: "Level 11: k & l",               type:'pair',   letters:['k','l'], wordLen:6, wordCount:4, part:1 },
+    { title: "Level 12: j & l",               type:'pair',   letters:['j','l'], wordLen:6, wordCount:4, part:1 },
+    { title: "Level 13: j k l in triples",    type:'combo',  keys:['j','k','l'], comboSize:3, wordCount:4, part:1 },
+    { title: "Level 14: j k l mixed up",      type:'random', keys:['j','k','l'], length:12, part:1 },
+    { title: "Level 15: whole home row words", type:'words', words:['salad','flask','falls'], part:1 }
   ];
 
   const cheer = ["Great job!", "Awesome!", "You got it!", "Super!", "Nice typing!", "Woohoo!"];
@@ -393,6 +517,59 @@
   let streak = 0;
   let locked = false; // true while popup is showing
 
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  const MAX_RUN = 3;
+
+  // Fills `length` letters from `pool` into `seq`, keeping each letter's count
+  // as equal as possible (rather than independent random picks, which can
+  // easily favor one letter over the others) while never exceeding MAX_RUN
+  // identical letters in a row.
+  function pushBalanced(seq, pool, length){
+    const base = Math.floor(length / pool.length);
+    let remainder = length % pool.length;
+    const counts = {};
+    pool.forEach(c => counts[c] = base);
+    shuffle(pool).slice(0, remainder).forEach(c => counts[c]++);
+
+    for(let i=0;i<length;i++){
+      let blocked = null;
+      if(seq.length){
+        const last = seq[seq.length - 1];
+        let runLen = 0;
+        for(let j=seq.length-1; j>=0 && seq[j]===last; j--) runLen++;
+        if(runLen >= MAX_RUN) blocked = last;
+      }
+      let candidates = pool.filter(c => counts[c] > 0 && c !== blocked);
+      if(candidates.length === 0) candidates = pool.filter(c => counts[c] > 0);
+      const maxCount = Math.max(...candidates.map(c => counts[c]));
+      const topCandidates = candidates.filter(c => counts[c] === maxCount);
+      const pick = topCandidates[Math.floor(Math.random()*topCandidates.length)];
+      seq.push(pick);
+      counts[pick]--;
+    }
+  }
+
+  function combinations(arr, k){
+    const results = [];
+    (function pick(start, combo){
+      if(combo.length === k){ results.push(combo.slice()); return; }
+      for(let i=start;i<arr.length;i++){
+        combo.push(arr[i]);
+        pick(i+1, combo);
+        combo.pop();
+      }
+    })(0, []);
+    return results;
+  }
+
   function buildSequence(level){
     let seq = [];
     let bounds = new Set();
@@ -402,12 +579,27 @@
         bounds.add(seq.length - 1);
       });
     } else if(level.type === 'random'){
-      for(let i=0;i<level.length;i++){
-        seq.push(level.keys[Math.floor(Math.random()*level.keys.length)]);
-        if((i+1) % 4 === 0) bounds.add(i);
+      pushBalanced(seq, level.keys, level.length);
+      for(let i=3;i<level.length;i+=4) bounds.add(i);
+      if((level.length - 1) % 4 !== 3) bounds.add(level.length - 1);
+    } else if(level.type === 'pair'){
+      const [x, y] = level.letters;
+      for(let i=0;i<level.wordLen;i++) seq.push(i % 2 === 0 ? x : y);
+      bounds.add(seq.length - 1);
+      for(let w=1; w<level.wordCount; w++){
+        pushBalanced(seq, level.letters, level.wordLen);
+        bounds.add(seq.length - 1);
+      }
+    } else if(level.type === 'combo'){
+      const wordLen = level.comboSize + 2;
+      const subsets = shuffle(combinations(level.keys, level.comboSize));
+      for(let w=0; w<level.wordCount; w++){
+        const pool = subsets[w % subsets.length];
+        pushBalanced(seq, pool, wordLen);
+        bounds.add(seq.length - 1);
       }
     } else if(level.type === 'words'){
-      level.words.forEach(w => {
+      shuffle(level.words).forEach(w => {
         w.split('').forEach(c => seq.push(c));
         bounds.add(seq.length - 1);
       });
@@ -417,25 +609,53 @@
 
   function renderLevelButtons(){
     levelBtnsWrap.innerHTML = '';
-    LEVELS.forEach((lvl, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'level-btn' + (i === currentLevelIndex ? ' active' : '');
-      btn.textContent = 'Level ' + (i+1);
-      btn.addEventListener('click', () => loadLevel(i));
-      levelBtnsWrap.appendChild(btn);
+    PARTS.forEach((part, partIdx) => {
+      const group = document.createElement('div');
+      group.className = 'part-group';
+      const label = document.createElement('div');
+      label.className = 'part-label';
+      label.textContent = part.label;
+      group.appendChild(label);
+      const row = document.createElement('div');
+      row.className = 'levels';
+      LEVELS.forEach((lvl, i) => {
+        if(lvl.part !== partIdx) return;
+        const btn = document.createElement('button');
+        btn.className = 'level-btn' + (i === currentLevelIndex ? ' active' : '');
+        btn.textContent = 'Level ' + (i+1);
+        btn.addEventListener('click', () => loadLevel(i));
+        row.appendChild(btn);
+      });
+      group.appendChild(row);
+      levelBtnsWrap.appendChild(group);
     });
+  }
+
+  function makeSeqBox(i){
+    const box = document.createElement('div');
+    box.className = 'seq-box';
+    box.id = 'seq-' + i;
+    box.textContent = chars[i];
+    return box;
   }
 
   function renderSequence(){
     sequenceRow.innerHTML = '';
-    chars.forEach((c, i) => {
-      const box = document.createElement('div');
-      box.className = 'seq-box';
-      box.id = 'seq-' + i;
-      box.textContent = c;
-      if(boundaries.has(i)) box.classList.add('gap-after');
-      sequenceRow.appendChild(box);
+    const sortedBounds = Array.from(boundaries).sort((a,b) => a-b);
+    let groupStart = 0;
+    sortedBounds.forEach(groupEnd => {
+      const group = document.createElement('div');
+      group.className = 'word-group';
+      for(let i=groupStart; i<=groupEnd; i++) group.appendChild(makeSeqBox(i));
+      sequenceRow.appendChild(group);
+      groupStart = groupEnd + 1;
     });
+    if(groupStart < chars.length){
+      const group = document.createElement('div');
+      group.className = 'word-group';
+      for(let i=groupStart; i<chars.length; i++) group.appendChild(makeSeqBox(i));
+      sequenceRow.appendChild(group);
+    }
   }
 
   function loadLevel(i){
@@ -473,12 +693,15 @@
     document.querySelectorAll('.finger').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.key-rect').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.key-label').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.touch-key').forEach(el => el.classList.remove('active'));
     const finger = document.getElementById('finger-' + letter);
     const key = document.getElementById('key-' + letter);
+    const touchKey = document.querySelector('.touch-key[data-letter="' + letter + '"]');
     if(finger) finger.classList.add('active');
     if(key){
       key.classList.add('active');
     }
+    if(touchKey) touchKey.classList.add('active');
   }
 
   function speakLetter(letter){
@@ -534,34 +757,37 @@
     if(locked) return;
     const pressed = e.key.toLowerCase();
     if(pressed.length !== 1 || !/[a-z]/.test(pressed)) return;
+    processLetter(pressed);
+  }
 
+  function processLetter(pressed){
+    if(locked) return;
     const expected = currentLetter();
     const box = document.getElementById('seq-' + currentIndex);
 
     if(pressed === expected){
       speakLetter(pressed);
-      box.classList.remove('wrong');
       box.classList.add('correct');
       streak++;
       streakEl.textContent = streak;
       feedbackEl.textContent = cheer[Math.floor(Math.random()*cheer.length)];
       feedbackEl.className = 'feedback good';
       burstStars();
-      currentIndex++;
-      if(currentIndex >= chars.length){
-        showLevelComplete();
-      } else {
-        highlightCurrent();
-      }
     } else {
       mistakesThisLevel++;
       mistakesEl.textContent = mistakesThisLevel;
       streak = 0;
       streakEl.textContent = 0;
       box.classList.add('wrong');
-      feedbackEl.textContent = 'Try again! Look for the ' + expected;
+      feedbackEl.textContent = 'That was the ' + expected.toUpperCase() + ' key!';
       feedbackEl.className = 'feedback miss';
-      setTimeout(() => box.classList.remove('wrong'), 300);
+    }
+
+    currentIndex++;
+    if(currentIndex >= chars.length){
+      showLevelComplete();
+    } else {
+      highlightCurrent();
     }
   }
 
@@ -580,6 +806,14 @@
   });
 
   document.addEventListener('keydown', handleKey);
+
+  document.querySelectorAll('.key-hit').forEach(hit => {
+    hit.addEventListener('click', () => processLetter(hit.dataset.letter));
+  });
+
+  document.querySelectorAll('.touch-key').forEach(btn => {
+    btn.addEventListener('click', () => processLetter(btn.dataset.letter));
+  });
 
   loadLevel(0);
 </script>
