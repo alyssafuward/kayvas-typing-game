@@ -117,6 +117,27 @@
     border-bottom-color: var(--sky);
     color: var(--ink);
   }
+  .sequence-row.story-mode{
+    display:block;
+    max-width: 560px;
+    overflow: hidden;
+    position: relative;
+  }
+  .story-lines{
+    display:flex;
+    flex-direction:column;
+    transition: transform 0.5s ease;
+  }
+  .story-line{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:10px 0.55em;
+    padding: 3px 0;
+  }
+  .sequence-row.story-mode .seq-box{
+    font-size: 1rem;
+  }
   .instructions{
     font-size:1.05rem;
     color: var(--ink);
@@ -363,8 +384,8 @@
     margin-bottom: 10px;
   }
   .popup-stars{
-    font-size:2.6rem;
-    letter-spacing: 8px;
+    font-size:2rem;
+    letter-spacing: 5px;
     color: var(--sun);
     margin-bottom: 12px;
   }
@@ -406,6 +427,7 @@
     .level-heading{ font-size:1rem; }
     .seq-box{ width:28px; height:34px; font-size:1rem; }
     .sequence-row.text-mode .seq-box{ width:auto; height:auto; font-size:1.4rem; }
+    .sequence-row.story-mode .seq-box{ font-size:0.9rem; }
     .instructions{ font-size:0.9rem; }
     .score-row{ font-size:0.9rem; gap:18px; }
     .level-btn{ font-size:0.75rem; padding:6px 10px; }
@@ -667,7 +689,8 @@
     { label: "Part 6: t y" },
     { label: "Part 7: z x c v" },
     { label: "Part 8: b n m" },
-    { label: "Part 9: words" }
+    { label: "Part 9: words" },
+    { label: "Part 10: fairytale" }
   ];
 
   const LEVELS = [
@@ -725,7 +748,15 @@
     { title: "Level 52: full keyboard finale", type:'words', words:['ninja','magic','jungle','amazing'], part:7 },
     { title: "Level 53: simple words",   type:'words', words:['cat','dog','run','sit','top'], spaces:true, part:8 },
     { title: "Level 54: more words",     type:'words', words:['jump','swim','frog','play','book'], spaces:true, part:8 },
-    { title: "Level 55: short phrases",  type:'words', words:['we','like','to','play'], spaces:true, ordered:true, part:8 }
+    { title: "Level 55: short phrases",  type:'words', words:['we','like','to','play'], spaces:true, ordered:true, part:8 },
+    { title: "Level 56: a fairytale story", type:'story', part:9, lines: [
+        "once upon a time a fox and a big hen",
+        "went to find a lost gem in the woods",
+        "they met a wizard who had six pet cats",
+        "he gave them a quick clue and a warm hug",
+        "they said thank you and ran home with joy",
+        "the end"
+      ] }
   ];
 
   const cheer = ["Great job!", "Awesome!", "You got it!", "Super!", "Nice typing!", "Woohoo!"];
@@ -745,6 +776,8 @@
   let currentLevelIndex = 0;
   let chars = [];
   let boundaries = new Set();
+  let lineBoundaries = [];
+  let currentStoryLine = 0;
   let currentIndex = 0;
   let mistakesThisLevel = 0;
   let streak = 0;
@@ -806,6 +839,7 @@
   function buildSequence(level){
     let seq = [];
     let bounds = new Set();
+    let lineBounds = [];
     if(level.type === 'blocks'){
       level.keys.forEach(k => {
         for(let i=0;i<level.repeat;i++) seq.push(k);
@@ -841,8 +875,21 @@
           bounds.add(seq.length - 1);
         }
       });
+    } else if(level.type === 'story'){
+      level.lines.forEach(line => {
+        const words = line.trim().split(/\s+/);
+        words.forEach((w, wIdx) => {
+          w.split('').forEach(c => seq.push(c));
+          bounds.add(seq.length - 1);
+          if(wIdx < words.length - 1){
+            seq.push(' ');
+            bounds.add(seq.length - 1);
+          }
+        });
+        lineBounds.push(seq.length - 1);
+      });
     }
-    return { seq, bounds };
+    return { seq, bounds, lineBounds };
   }
 
   let expandedPart = 0;
@@ -894,6 +941,11 @@
       if(level.spaces) letters.push(' ');
       return letters;
     }
+    if(level.lines){
+      const letters = Array.from(new Set(level.lines.join('').replace(/\s+/g,'').split('')));
+      letters.push(' ');
+      return letters;
+    }
     return [];
   }
 
@@ -923,9 +975,17 @@
     return box;
   }
 
-  function renderSequence(isWordsStyle){
+  function renderSequence(isWordsStyle, isStoryStyle){
     sequenceRow.innerHTML = '';
-    sequenceRow.classList.toggle('text-mode', !!isWordsStyle);
+    sequenceRow.classList.toggle('text-mode', !!isWordsStyle || !!isStoryStyle);
+    sequenceRow.classList.toggle('story-mode', !!isStoryStyle);
+    sequenceRow.style.height = '';
+
+    if(isStoryStyle){
+      renderStorySequence();
+      return;
+    }
+
     const sortedBounds = Array.from(boundaries).sort((a,b) => a-b);
     let groupStart = 0;
     sortedBounds.forEach(groupEnd => {
@@ -943,6 +1003,48 @@
     }
   }
 
+  function renderStorySequence(){
+    const wrap = document.createElement('div');
+    wrap.className = 'story-lines';
+    wrap.id = 'storyLines';
+    const sortedBounds = Array.from(boundaries).sort((a,b) => a-b);
+    let lineStart = 0;
+    lineBoundaries.forEach((lineEnd, lineIdx) => {
+      const lineEl = document.createElement('div');
+      lineEl.className = 'story-line';
+      lineEl.id = 'story-line-' + lineIdx;
+      let groupStart = lineStart;
+      sortedBounds.filter(b => b >= lineStart && b <= lineEnd).forEach(groupEnd => {
+        const group = document.createElement('div');
+        group.className = 'word-group';
+        for(let i=groupStart; i<=groupEnd; i++) group.appendChild(makeSeqBox(i));
+        lineEl.appendChild(group);
+        groupStart = groupEnd + 1;
+      });
+      wrap.appendChild(lineEl);
+      lineStart = lineEnd + 1;
+    });
+    sequenceRow.appendChild(wrap);
+    currentStoryLine = 0;
+    scrollStoryToLine(0, false);
+  }
+
+  function lineForIndex(idx){
+    for(let i=0;i<lineBoundaries.length;i++){
+      if(idx <= lineBoundaries[i]) return i;
+    }
+    return lineBoundaries.length - 1;
+  }
+
+  function scrollStoryToLine(lineIdx, animate){
+    const wrap = document.getElementById('storyLines');
+    const lineEl = document.getElementById('story-line-' + lineIdx);
+    if(!wrap || !lineEl) return;
+    sequenceRow.style.height = lineEl.offsetHeight + 'px';
+    wrap.style.transition = animate ? 'transform 0.5s ease' : 'none';
+    wrap.style.transform = 'translateY(-' + lineEl.offsetTop + 'px)';
+  }
+
   function loadLevel(i){
     currentLevelIndex = i;
     const level = LEVELS[i];
@@ -951,18 +1053,20 @@
     const built = buildSequence(level);
     chars = built.seq;
     boundaries = built.bounds;
+    lineBoundaries = built.lineBounds.length ? built.lineBounds : [chars.length - 1];
+    currentStoryLine = 0;
     currentIndex = 0;
     mistakesThisLevel = 0;
     streak = 0;
     locked = false;
     levelHeading.textContent = level.title;
-    keyboardHeadingEl.textContent = level.part <= 2 ? 'Home Row' : (level.part <= 5 ? 'Top Row' : 'Bottom Row');
+    keyboardHeadingEl.textContent = level.type === 'story' ? 'Full Keyboard' : (level.part <= 2 ? 'Home Row' : (level.part <= 5 ? 'Top Row' : 'Bottom Row'));
     mistakesEl.textContent = 0;
     streakEl.textContent = 0;
     feedbackEl.textContent = '';
     popupOverlay.style.display = 'none';
     renderLevelButtons();
-    renderSequence(level.type === 'words');
+    renderSequence(level.type === 'words', level.type === 'story');
     highlightCurrent();
   }
 
@@ -975,6 +1079,13 @@
     const box = document.getElementById('seq-' + currentIndex);
     if(box) box.classList.add('current');
     highlightHand(currentLetter());
+    if(LEVELS[currentLevelIndex].type === 'story'){
+      const lIdx = lineForIndex(currentIndex);
+      if(lIdx !== currentStoryLine){
+        currentStoryLine = lIdx;
+        scrollStoryToLine(lIdx, true);
+      }
+    }
   }
 
   function highlightHand(letter){
@@ -1018,21 +1129,31 @@
   }
 
   function starsForLevel(mistakes, length){
-    if(mistakes === 0) return 3;
-    if(mistakes <= Math.max(1, Math.round(length * 0.15))) return 2;
+    if(mistakes === 0) return 5;
+    const t1 = Math.max(1, Math.round(length * 0.05));
+    const t2 = Math.max(t1 + 1, Math.round(length * 0.10));
+    const t3 = Math.max(t2 + 1, Math.round(length * 0.20));
+    if(mistakes <= t1) return 4;
+    if(mistakes <= t2) return 3;
+    if(mistakes <= t3) return 2;
     return 1;
   }
 
   function showLevelComplete(){
     locked = true;
     const stars = starsForLevel(mistakesThisLevel, chars.length);
-    popupStars.textContent = '★'.repeat(stars) + '☆'.repeat(3 - stars);
-    if(stars === 3){
+    popupStars.textContent = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+    const mixups = mistakesThisLevel + ' mix-up' + (mistakesThisLevel === 1 ? '' : 's');
+    if(stars === 5){
       popupSub.textContent = 'Perfect! No mistakes!';
+    } else if(stars === 4){
+      popupSub.textContent = 'Excellent! ' + mixups + '.';
+    } else if(stars === 3){
+      popupSub.textContent = 'Nice work! ' + mixups + '.';
     } else if(stars === 2){
-      popupSub.textContent = 'Nice work! ' + mistakesThisLevel + ' mix-up' + (mistakesThisLevel===1?'':'s') + '.';
+      popupSub.textContent = 'Good try! ' + mixups + '.';
     } else {
-      popupSub.textContent = 'Keep practicing! ' + mistakesThisLevel + ' mix-ups.';
+      popupSub.textContent = 'Keep practicing! ' + mixups + '.';
     }
     const nextBtn = document.getElementById('nextBtn');
     if(currentLevelIndex === LEVELS.length - 1){
@@ -1047,6 +1168,7 @@
 
   function handleKey(e){
     if(locked) return;
+    if(e.metaKey || e.ctrlKey || e.altKey) return;
     const pressed = e.key === ' ' ? ' ' : e.key.toLowerCase();
     if(pressed.length !== 1 || !/[a-z ]/.test(pressed)) return;
     e.preventDefault();
