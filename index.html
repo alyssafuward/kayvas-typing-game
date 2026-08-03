@@ -531,15 +531,42 @@
           <rect class="key-hit" data-letter="k" x="418" y="72" width="48" height="58" rx="12"/>
           <rect class="key-hit" data-letter="l" x="472" y="72" width="48" height="58" rx="12"/>
         </g>
-        <!-- row 3: bottom row (decorative) -->
-        <g id="row3">
-          <rect class="key-rect key-inactive" x="94"  y="192" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="118" y="222">z</text>
-          <rect class="key-rect key-inactive" x="148" y="192" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="172" y="222">x</text>
-          <rect class="key-rect key-inactive" x="202" y="192" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="226" y="222">c</text>
-          <rect class="key-rect key-inactive" x="256" y="192" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="280" y="222">v</text>
-          <rect class="key-rect key-inactive" x="310" y="192" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="334" y="222">b</text>
-          <rect class="key-rect key-inactive" x="364" y="192" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="388" y="222">n</text>
-          <rect class="key-rect key-inactive" x="418" y="192" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="442" y="222">m</text>
+        <!-- row 3: bottom row (playable) -->
+        <g id="row3keys">
+          <rect class="key-rect" id="key-z" x="94"  y="192" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-x" x="148" y="192" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-c" x="202" y="192" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-v" x="256" y="192" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-b" x="310" y="192" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-n" x="364" y="192" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-m" x="418" y="192" width="48" height="48" rx="10"/>
+          <text class="key-label" id="label-z" x="118" y="222">z</text>
+          <text class="key-label" id="label-x" x="172" y="222">x</text>
+          <text class="key-label" id="label-c" x="226" y="222">c</text>
+          <text class="key-label" id="label-v" x="280" y="222">v</text>
+          <text class="key-label" id="label-b" x="334" y="222">b</text>
+          <text class="key-label" id="label-n" x="388" y="222">n</text>
+          <text class="key-label" id="label-m" x="442" y="222">m</text>
+        </g>
+        <!-- fingers for bottom row -->
+        <g id="fingersBottom">
+          <rect class="finger" id="finger-z" x="101" y="192" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-x" x="155" y="192" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-c" x="209" y="192" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-v" x="263" y="192" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-b" x="317" y="192" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-n" x="371" y="192" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-m" x="425" y="192" width="34" height="58" rx="17"/>
+        </g>
+        <!-- transparent tap targets for bottom row, for touchscreens -->
+        <g id="hitboxesBottom">
+          <rect class="key-hit" data-letter="z" x="94"  y="192" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="x" x="148" y="192" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="c" x="202" y="192" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="v" x="256" y="192" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="b" x="310" y="192" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="n" x="364" y="192" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="m" x="418" y="192" width="48" height="58" rx="12"/>
         </g>
       </svg>
     </div>
@@ -576,6 +603,19 @@
             <button class="touch-key" data-letter="l">l</button>
           </div>
         </div>
+        <div class="touch-keys-row">
+          <div class="touch-keys-group">
+            <button class="touch-key" data-letter="z">z</button>
+            <button class="touch-key" data-letter="x">x</button>
+            <button class="touch-key" data-letter="c">c</button>
+            <button class="touch-key" data-letter="v">v</button>
+            <button class="touch-key" data-letter="b">b</button>
+          </div>
+          <div class="touch-keys-group">
+            <button class="touch-key" data-letter="n">n</button>
+            <button class="touch-key" data-letter="m">m</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -602,7 +642,9 @@
     { label: "Part 3: g h" },
     { label: "Part 4: q w e r" },
     { label: "Part 5: u i o p" },
-    { label: "Part 6: t y" }
+    { label: "Part 6: t y" },
+    { label: "Part 7: z x c v b" },
+    { label: "Part 8: n m" }
   ];
 
   const LEVELS = [
@@ -642,7 +684,19 @@
     { title: "Level 34: uiop words",          type:'words',  words:['guide','wired','aside','power'], part:4 },
     { title: "Level 35: t y in a row",        type:'blocks', keys:['t','y'], repeat:4, part:5 },
     { title: "Level 36: t & y",               type:'pair',   letters:['t','y'], wordLen:6, wordCount:4, part:5 },
-    { title: "Level 37: full keyboard words", type:'words',  words:['story','quiet','purple','delight','little','history','yellow','usually'], part:5 }
+    { title: "Level 37: full keyboard words", type:'words',  words:['story','quiet','purple','delight','little','history','yellow','usually'], part:5 },
+    { title: "Level 38: z x c v b in a row", type:'blocks', keys:['z','x','c','v','b'], repeat:4, part:6 },
+    { title: "Level 39: z & x",              type:'pair',   letters:['z','x'], wordLen:6, wordCount:4, part:6 },
+    { title: "Level 40: x & c",              type:'pair',   letters:['x','c'], wordLen:6, wordCount:4, part:6 },
+    { title: "Level 41: c & v",              type:'pair',   letters:['c','v'], wordLen:6, wordCount:4, part:6 },
+    { title: "Level 42: v & b",              type:'pair',   letters:['v','b'], wordLen:6, wordCount:4, part:6 },
+    { title: "Level 43: b & z",              type:'pair',   letters:['b','z'], wordLen:6, wordCount:4, part:6 },
+    { title: "Level 44: z x c v b in triples", type:'combo', keys:['z','x','c','v','b'], comboSize:3, wordCount:4, part:6 },
+    { title: "Level 45: z x c v b mixed up", type:'random', keys:['z','x','c','v','b'], length:20, part:6 },
+    { title: "Level 46: zxcvb words",        type:'words',  words:['zebra','puzzle','brave','catchy'], part:6 },
+    { title: "Level 47: n m in a row",       type:'blocks', keys:['n','m'], repeat:4, part:7 },
+    { title: "Level 48: n & m",              type:'pair',   letters:['n','m'], wordLen:6, wordCount:4, part:7 },
+    { title: "Level 49: full keyboard finale", type:'words', words:['ninja','magic','jungle','amazing'], part:7 }
   ];
 
   const cheer = ["Great job!", "Awesome!", "You got it!", "Super!", "Nice typing!", "Woohoo!"];
@@ -792,7 +846,7 @@
     });
   }
 
-  const ALL_LETTERS = ['a','s','d','f','g','h','j','k','l','q','w','e','r','t','y','u','i','o','p'];
+  const ALL_LETTERS = ['a','s','d','f','g','h','j','k','l','q','w','e','r','t','y','u','i','o','p','z','x','c','v','b','n','m'];
 
   function levelLetters(level){
     if(level.keys) return level.keys;
@@ -857,7 +911,7 @@
     streak = 0;
     locked = false;
     levelHeading.textContent = level.title;
-    keyboardHeadingEl.textContent = level.part <= 2 ? 'Home Row' : 'Top Row';
+    keyboardHeadingEl.textContent = level.part <= 2 ? 'Home Row' : (level.part <= 5 ? 'Top Row' : 'Bottom Row');
     mistakesEl.textContent = 0;
     streakEl.textContent = 0;
     feedbackEl.textContent = '';
