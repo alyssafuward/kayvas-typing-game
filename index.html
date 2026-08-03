@@ -273,6 +273,10 @@
   .touch-key:active{ transform:scale(0.92); }
   .touch-key.active{ background:var(--sun); border-color:#D9AC1F; }
   .touch-key.level-dim{ opacity:0.35; }
+  .touch-key-space{
+    width:220px; min-width:220px;
+    font-size:1rem;
+  }
   .key-rect{
     fill: #EDEFF3;
     stroke: #C7CCD6;
@@ -323,6 +327,15 @@
     stroke: #D98F5F;
     stroke-width: 2;
     opacity: 0.5;
+    transition: fill 0.15s ease, opacity 0.15s ease;
+  }
+  .thumb.active{
+    fill: var(--berry);
+    stroke: #C13E63;
+    opacity: 0.92;
+  }
+  .thumb.level-dim{
+    opacity: 0.15;
   }
   .palm{
     fill: #F7C9A6;
@@ -426,7 +439,7 @@
 
       <div class="keyboard-heading" id="keyboardHeading">Home Row</div>
       <div class="keyboard-wrap">
-      <svg viewBox="0 0 640 260">
+      <svg viewBox="0 0 640 300">
         <!-- row 1: top row (playable) -->
         <g id="row1keys">
           <rect class="key-rect" id="key-q" x="67"  y="20" width="48" height="48" rx="10"/>
@@ -568,6 +581,12 @@
           <rect class="key-hit" data-letter="n" x="364" y="192" width="48" height="58" rx="12"/>
           <rect class="key-hit" data-letter="m" x="418" y="192" width="48" height="58" rx="12"/>
         </g>
+        <!-- space bar (playable) -->
+        <g id="spaceKey">
+          <rect class="key-rect" id="key-space" x="140" y="252" width="340" height="36" rx="10"/>
+          <text class="key-label" id="label-space" x="310" y="276">space</text>
+          <rect class="key-hit" data-letter=" " x="140" y="252" width="340" height="36" rx="10"/>
+        </g>
       </svg>
     </div>
 
@@ -616,6 +635,9 @@
             <button class="touch-key" data-letter="m">m</button>
           </div>
         </div>
+        <div class="touch-keys-row">
+          <button class="touch-key touch-key-space" data-letter=" ">space</button>
+        </div>
       </div>
     </div>
   </div>
@@ -644,7 +666,8 @@
     { label: "Part 5: u i o p" },
     { label: "Part 6: t y" },
     { label: "Part 7: z x c v" },
-    { label: "Part 8: b n m" }
+    { label: "Part 8: b n m" },
+    { label: "Part 9: words" }
   ];
 
   const LEVELS = [
@@ -699,7 +722,10 @@
     { title: "Level 49: b & m",              type:'pair',   letters:['b','m'], wordLen:6, wordCount:4, part:7 },
     { title: "Level 50: b n m in triples",   type:'combo',  keys:['b','n','m'], comboSize:3, wordCount:4, part:7 },
     { title: "Level 51: b n m mixed up",     type:'random', keys:['b','n','m'], length:12, part:7 },
-    { title: "Level 52: full keyboard finale", type:'words', words:['ninja','magic','jungle','amazing'], part:7 }
+    { title: "Level 52: full keyboard finale", type:'words', words:['ninja','magic','jungle','amazing'], part:7 },
+    { title: "Level 53: simple words",   type:'words', words:['cat','dog','run','sit','top'], spaces:true, part:8 },
+    { title: "Level 54: more words",     type:'words', words:['jump','swim','frog','play','book'], spaces:true, part:8 },
+    { title: "Level 55: short phrases",  type:'words', words:['we','like','to','play'], spaces:true, ordered:true, part:8 }
   ];
 
   const cheer = ["Great job!", "Awesome!", "You got it!", "Super!", "Nice typing!", "Woohoo!"];
@@ -806,9 +832,14 @@
         bounds.add(seq.length - 1);
       }
     } else if(level.type === 'words'){
-      shuffle(level.words).forEach(w => {
+      const list = level.ordered ? level.words.slice() : shuffle(level.words);
+      list.forEach((w, idx) => {
         w.split('').forEach(c => seq.push(c));
         bounds.add(seq.length - 1);
+        if(level.spaces && idx < list.length - 1){
+          seq.push(' ');
+          bounds.add(seq.length - 1);
+        }
       });
     }
     return { seq, bounds };
@@ -849,12 +880,20 @@
     });
   }
 
-  const ALL_LETTERS = ['a','s','d','f','g','h','j','k','l','q','w','e','r','t','y','u','i','o','p','z','x','c','v','b','n','m'];
+  const ALL_LETTERS = ['a','s','d','f','g','h','j','k','l','q','w','e','r','t','y','u','i','o','p','z','x','c','v','b','n','m',' '];
+
+  function keyId(letter){
+    return letter === ' ' ? 'space' : letter;
+  }
 
   function levelLetters(level){
     if(level.keys) return level.keys;
     if(level.letters) return level.letters;
-    if(level.words) return Array.from(new Set(level.words.join('').split('')));
+    if(level.words){
+      const letters = Array.from(new Set(level.words.join('').split('')));
+      if(level.spaces) letters.push(' ');
+      return letters;
+    }
     return [];
   }
 
@@ -862,14 +901,17 @@
     const used = new Set(levelLetters(level));
     ALL_LETTERS.forEach(letter => {
       const inUse = used.has(letter);
-      const key = document.getElementById('key-' + letter);
-      const label = document.getElementById('label-' + letter);
-      const finger = document.getElementById('finger-' + letter);
+      const key = document.getElementById('key-' + keyId(letter));
+      const label = document.getElementById('label-' + keyId(letter));
+      const finger = document.getElementById('finger-' + keyId(letter));
       const touchKey = document.querySelector('.touch-key[data-letter="' + letter + '"]');
       if(key) key.classList.toggle('key-inactive', !inUse);
       if(label) label.classList.toggle('key-inactive', !inUse);
       if(finger) finger.classList.toggle('level-dim', !inUse);
       if(touchKey) touchKey.classList.toggle('level-dim', !inUse);
+      if(letter === ' '){
+        document.querySelectorAll('.thumb').forEach(t => t.classList.toggle('level-dim', !inUse));
+      }
     });
   }
 
@@ -877,7 +919,7 @@
     const box = document.createElement('div');
     box.className = 'seq-box';
     box.id = 'seq-' + i;
-    box.textContent = chars[i];
+    box.textContent = chars[i] === ' ' ? '_' : chars[i];
     return box;
   }
 
@@ -940,20 +982,24 @@
     document.querySelectorAll('.key-rect').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.key-label').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.touch-key').forEach(el => el.classList.remove('active'));
-    const finger = document.getElementById('finger-' + letter);
-    const key = document.getElementById('key-' + letter);
+    document.querySelectorAll('.thumb').forEach(el => el.classList.remove('active'));
+    const finger = document.getElementById('finger-' + keyId(letter));
+    const key = document.getElementById('key-' + keyId(letter));
     const touchKey = document.querySelector('.touch-key[data-letter="' + letter + '"]');
     if(finger) finger.classList.add('active');
     if(key){
       key.classList.add('active');
     }
     if(touchKey) touchKey.classList.add('active');
+    if(letter === ' '){
+      document.querySelectorAll('.thumb').forEach(el => el.classList.add('active'));
+    }
   }
 
   function speakLetter(letter){
     if(!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
-    const utter = new SpeechSynthesisUtterance(letter);
+    const utter = new SpeechSynthesisUtterance(letter === ' ' ? 'space' : letter);
     utter.rate = 0.85;
     utter.pitch = 1.1;
     window.speechSynthesis.speak(utter);
@@ -1001,8 +1047,9 @@
 
   function handleKey(e){
     if(locked) return;
-    const pressed = e.key.toLowerCase();
-    if(pressed.length !== 1 || !/[a-z]/.test(pressed)) return;
+    const pressed = e.key === ' ' ? ' ' : e.key.toLowerCase();
+    if(pressed.length !== 1 || !/[a-z ]/.test(pressed)) return;
+    e.preventDefault();
     processLetter(pressed);
   }
 
@@ -1025,7 +1072,7 @@
       streak = 0;
       streakEl.textContent = 0;
       box.classList.add('wrong');
-      feedbackEl.textContent = 'That was the ' + expected.toUpperCase() + ' key!';
+      feedbackEl.textContent = 'That was the ' + (expected === ' ' ? 'SPACE' : expected.toUpperCase()) + ' key!';
       feedbackEl.className = 'feedback miss';
     }
 
