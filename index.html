@@ -246,12 +246,16 @@
     cursor: pointer;
   }
   .touch-keys{
-    display:flex; justify-content:center; align-items:center;
-    gap:20px; flex-wrap:wrap;
+    display:flex; flex-direction:column; align-items:center;
+    gap:14px;
     margin-top:16px;
   }
+  .touch-keys-row{
+    display:flex; justify-content:center; align-items:center;
+    gap:20px; flex-wrap:wrap;
+  }
   .touch-keys-group{
-    display:flex; gap:8px;
+    display:flex; gap:16px;
   }
   .touch-key{
     width:56px; height:56px;
@@ -378,6 +382,9 @@
     .part-label{ justify-content:center; }
     .levels{ flex-direction:row; flex-wrap:wrap; justify-content:center; }
     .level-btn{ text-align:center; }
+    .touch-keys{ gap:18px; }
+    .touch-keys-row{ gap:26px; }
+    .touch-keys-group{ gap:20px; }
   }
 
   @media (max-width: 480px){
@@ -417,21 +424,57 @@
       </div>
       <div class="feedback" id="feedback"></div>
 
-      <div class="keyboard-heading">Home Row</div>
+      <div class="keyboard-heading" id="keyboardHeading">Home Row</div>
       <div class="keyboard-wrap">
       <svg viewBox="0 0 640 260">
-        <!-- row 1: top row (decorative) -->
-        <g id="row1">
-          <rect class="key-rect key-inactive" x="67"  y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="91"  y="50">q</text>
-          <rect class="key-rect key-inactive" x="121" y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="145" y="50">w</text>
-          <rect class="key-rect key-inactive" x="175" y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="199" y="50">e</text>
-          <rect class="key-rect key-inactive" x="229" y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="253" y="50">r</text>
-          <rect class="key-rect key-inactive" x="283" y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="307" y="50">t</text>
-          <rect class="key-rect key-inactive" x="337" y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="361" y="50">y</text>
-          <rect class="key-rect key-inactive" x="391" y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="415" y="50">u</text>
-          <rect class="key-rect key-inactive" x="445" y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="469" y="50">i</text>
-          <rect class="key-rect key-inactive" x="499" y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="523" y="50">o</text>
-          <rect class="key-rect key-inactive" x="553" y="20" width="48" height="48" rx="10"/><text class="key-label key-inactive" x="577" y="50">p</text>
+        <!-- row 1: top row (playable) -->
+        <g id="row1keys">
+          <rect class="key-rect" id="key-q" x="67"  y="20" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-w" x="121" y="20" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-e" x="175" y="20" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-r" x="229" y="20" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-t" x="283" y="20" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-y" x="337" y="20" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-u" x="391" y="20" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-i" x="445" y="20" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-o" x="499" y="20" width="48" height="48" rx="10"/>
+          <rect class="key-rect" id="key-p" x="553" y="20" width="48" height="48" rx="10"/>
+          <text class="key-label" id="label-q" x="91"  y="50">q</text>
+          <text class="key-label" id="label-w" x="145" y="50">w</text>
+          <text class="key-label" id="label-e" x="199" y="50">e</text>
+          <text class="key-label" id="label-r" x="253" y="50">r</text>
+          <text class="key-label" id="label-t" x="307" y="50">t</text>
+          <text class="key-label" id="label-y" x="361" y="50">y</text>
+          <text class="key-label" id="label-u" x="415" y="50">u</text>
+          <text class="key-label" id="label-i" x="469" y="50">i</text>
+          <text class="key-label" id="label-o" x="523" y="50">o</text>
+          <text class="key-label" id="label-p" x="577" y="50">p</text>
+        </g>
+        <!-- fingers for top row -->
+        <g id="fingersTop">
+          <rect class="finger" id="finger-q" x="74"  y="10" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-w" x="128" y="10" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-e" x="182" y="10" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-r" x="236" y="10" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-t" x="290" y="10" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-y" x="344" y="10" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-u" x="398" y="10" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-i" x="452" y="10" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-o" x="506" y="10" width="34" height="58" rx="17"/>
+          <rect class="finger" id="finger-p" x="560" y="10" width="34" height="58" rx="17"/>
+        </g>
+        <!-- transparent tap targets for top row, for touchscreens -->
+        <g id="hitboxesTop">
+          <rect class="key-hit" data-letter="q" x="67"  y="10" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="w" x="121" y="10" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="e" x="175" y="10" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="r" x="229" y="10" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="t" x="283" y="10" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="y" x="337" y="10" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="u" x="391" y="10" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="i" x="445" y="10" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="o" x="499" y="10" width="48" height="58" rx="12"/>
+          <rect class="key-hit" data-letter="p" x="553" y="10" width="48" height="58" rx="12"/>
         </g>
         <!-- palms -->
         <g id="palms">
@@ -502,18 +545,36 @@
     </div>
 
       <div class="touch-keys" id="touchKeys">
-        <div class="touch-keys-group">
-          <button class="touch-key" data-letter="a">a</button>
-          <button class="touch-key" data-letter="s">s</button>
-          <button class="touch-key" data-letter="d">d</button>
-          <button class="touch-key" data-letter="f">f</button>
-          <button class="touch-key" data-letter="g">g</button>
+        <div class="touch-keys-row">
+          <div class="touch-keys-group">
+            <button class="touch-key" data-letter="q">q</button>
+            <button class="touch-key" data-letter="w">w</button>
+            <button class="touch-key" data-letter="e">e</button>
+            <button class="touch-key" data-letter="r">r</button>
+            <button class="touch-key" data-letter="t">t</button>
+          </div>
+          <div class="touch-keys-group">
+            <button class="touch-key" data-letter="y">y</button>
+            <button class="touch-key" data-letter="u">u</button>
+            <button class="touch-key" data-letter="i">i</button>
+            <button class="touch-key" data-letter="o">o</button>
+            <button class="touch-key" data-letter="p">p</button>
+          </div>
         </div>
-        <div class="touch-keys-group">
-          <button class="touch-key" data-letter="h">h</button>
-          <button class="touch-key" data-letter="j">j</button>
-          <button class="touch-key" data-letter="k">k</button>
-          <button class="touch-key" data-letter="l">l</button>
+        <div class="touch-keys-row">
+          <div class="touch-keys-group">
+            <button class="touch-key" data-letter="a">a</button>
+            <button class="touch-key" data-letter="s">s</button>
+            <button class="touch-key" data-letter="d">d</button>
+            <button class="touch-key" data-letter="f">f</button>
+            <button class="touch-key" data-letter="g">g</button>
+          </div>
+          <div class="touch-keys-group">
+            <button class="touch-key" data-letter="h">h</button>
+            <button class="touch-key" data-letter="j">j</button>
+            <button class="touch-key" data-letter="k">k</button>
+            <button class="touch-key" data-letter="l">l</button>
+          </div>
         </div>
       </div>
     </div>
@@ -538,7 +599,10 @@
   const PARTS = [
     { label: "Part 1: a s d f" },
     { label: "Part 2: j k l" },
-    { label: "Part 3: g h" }
+    { label: "Part 3: g h" },
+    { label: "Part 4: q w e r" },
+    { label: "Part 5: u i o p" },
+    { label: "Part 6: t y" }
   ];
 
   const LEVELS = [
@@ -559,7 +623,26 @@
     { title: "Level 15: asdf + jkl words",    type:'words',  words:['salad','flask','falls'], part:1 },
     { title: "Level 16: g h in a row",        type:'blocks', keys:['g','h'], repeat:4, part:2 },
     { title: "Level 17: g & h",               type:'pair',   letters:['g','h'], wordLen:6, wordCount:4, part:2 },
-    { title: "Level 18: full home row words", type:'words',  words:['flag','flash','half','hall','glass','shall','slash','dash'], part:2 }
+    { title: "Level 18: full home row words", type:'words',  words:['flag','flash','half','hall','glass','shall','slash','dash'], part:2 },
+    { title: "Level 19: q w e r in a row",    type:'blocks', keys:['q','w','e','r'], repeat:4, part:3 },
+    { title: "Level 20: q & w",               type:'pair',   letters:['q','w'], wordLen:6, wordCount:4, part:3 },
+    { title: "Level 21: w & e",               type:'pair',   letters:['w','e'], wordLen:6, wordCount:4, part:3 },
+    { title: "Level 22: e & r",               type:'pair',   letters:['e','r'], wordLen:6, wordCount:4, part:3 },
+    { title: "Level 23: q & r",               type:'pair',   letters:['q','r'], wordLen:6, wordCount:4, part:3 },
+    { title: "Level 24: q w e r in triples",  type:'combo',  keys:['q','w','e','r'], comboSize:3, wordCount:4, part:3 },
+    { title: "Level 25: q w e r mixed up",    type:'random', keys:['q','w','e','r'], length:16, part:3 },
+    { title: "Level 26: qwer words",          type:'words',  words:['dare','fear','gear','wears'], part:3 },
+    { title: "Level 27: u i o p in a row",    type:'blocks', keys:['u','i','o','p'], repeat:4, part:4 },
+    { title: "Level 28: u & i",               type:'pair',   letters:['u','i'], wordLen:6, wordCount:4, part:4 },
+    { title: "Level 29: i & o",               type:'pair',   letters:['i','o'], wordLen:6, wordCount:4, part:4 },
+    { title: "Level 30: o & p",               type:'pair',   letters:['o','p'], wordLen:6, wordCount:4, part:4 },
+    { title: "Level 31: u & p",               type:'pair',   letters:['u','p'], wordLen:6, wordCount:4, part:4 },
+    { title: "Level 32: u i o p in triples",  type:'combo',  keys:['u','i','o','p'], comboSize:3, wordCount:4, part:4 },
+    { title: "Level 33: u i o p mixed up",    type:'random', keys:['u','i','o','p'], length:16, part:4 },
+    { title: "Level 34: uiop words",          type:'words',  words:['guide','wired','aside','power'], part:4 },
+    { title: "Level 35: t y in a row",        type:'blocks', keys:['t','y'], repeat:4, part:5 },
+    { title: "Level 36: t & y",               type:'pair',   letters:['t','y'], wordLen:6, wordCount:4, part:5 },
+    { title: "Level 37: full keyboard words", type:'words',  words:['story','quiet','purple','delight','little','history','yellow','usually'], part:5 }
   ];
 
   const cheer = ["Great job!", "Awesome!", "You got it!", "Super!", "Nice typing!", "Woohoo!"];
@@ -574,6 +657,7 @@
   const popupOverlay = document.getElementById('popupOverlay');
   const popupStars = document.getElementById('popupStars');
   const popupSub = document.getElementById('popupSub');
+  const keyboardHeadingEl = document.getElementById('keyboardHeading');
 
   let currentLevelIndex = 0;
   let chars = [];
@@ -708,7 +792,7 @@
     });
   }
 
-  const HOME_ROW = ['a','s','d','f','g','h','j','k','l'];
+  const ALL_LETTERS = ['a','s','d','f','g','h','j','k','l','q','w','e','r','t','y','u','i','o','p'];
 
   function levelLetters(level){
     if(level.keys) return level.keys;
@@ -719,7 +803,7 @@
 
   function updateKeyboardHighlight(level){
     const used = new Set(levelLetters(level));
-    HOME_ROW.forEach(letter => {
+    ALL_LETTERS.forEach(letter => {
       const inUse = used.has(letter);
       const key = document.getElementById('key-' + letter);
       const label = document.getElementById('label-' + letter);
@@ -773,6 +857,7 @@
     streak = 0;
     locked = false;
     levelHeading.textContent = level.title;
+    keyboardHeadingEl.textContent = level.part <= 2 ? 'Home Row' : 'Top Row';
     mistakesEl.textContent = 0;
     streakEl.textContent = 0;
     feedbackEl.textContent = '';
