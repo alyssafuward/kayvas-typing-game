@@ -609,9 +609,9 @@
             <button class="touch-key" data-letter="x">x</button>
             <button class="touch-key" data-letter="c">c</button>
             <button class="touch-key" data-letter="v">v</button>
-            <button class="touch-key" data-letter="b">b</button>
           </div>
           <div class="touch-keys-group">
+            <button class="touch-key" data-letter="b">b</button>
             <button class="touch-key" data-letter="n">n</button>
             <button class="touch-key" data-letter="m">m</button>
           </div>
@@ -643,8 +643,8 @@
     { label: "Part 4: q w e r" },
     { label: "Part 5: u i o p" },
     { label: "Part 6: t y" },
-    { label: "Part 7: z x c v b" },
-    { label: "Part 8: n m" }
+    { label: "Part 7: z x c v" },
+    { label: "Part 8: b n m" }
   ];
 
   const LEVELS = [
@@ -685,18 +685,21 @@
     { title: "Level 35: t y in a row",        type:'blocks', keys:['t','y'], repeat:4, part:5 },
     { title: "Level 36: t & y",               type:'pair',   letters:['t','y'], wordLen:6, wordCount:4, part:5 },
     { title: "Level 37: full keyboard words", type:'words',  words:['story','quiet','purple','delight','little','history','yellow','usually'], part:5 },
-    { title: "Level 38: z x c v b in a row", type:'blocks', keys:['z','x','c','v','b'], repeat:4, part:6 },
+    { title: "Level 38: z x c v in a row",   type:'blocks', keys:['z','x','c','v'], repeat:4, part:6 },
     { title: "Level 39: z & x",              type:'pair',   letters:['z','x'], wordLen:6, wordCount:4, part:6 },
     { title: "Level 40: x & c",              type:'pair',   letters:['x','c'], wordLen:6, wordCount:4, part:6 },
     { title: "Level 41: c & v",              type:'pair',   letters:['c','v'], wordLen:6, wordCount:4, part:6 },
-    { title: "Level 42: v & b",              type:'pair',   letters:['v','b'], wordLen:6, wordCount:4, part:6 },
-    { title: "Level 43: b & z",              type:'pair',   letters:['b','z'], wordLen:6, wordCount:4, part:6 },
-    { title: "Level 44: z x c v b in triples", type:'combo', keys:['z','x','c','v','b'], comboSize:3, wordCount:4, part:6 },
-    { title: "Level 45: z x c v b mixed up", type:'random', keys:['z','x','c','v','b'], length:20, part:6 },
-    { title: "Level 46: zxcvb words",        type:'words',  words:['zebra','puzzle','brave','catchy'], part:6 },
-    { title: "Level 47: n m in a row",       type:'blocks', keys:['n','m'], repeat:4, part:7 },
+    { title: "Level 42: z & v",              type:'pair',   letters:['z','v'], wordLen:6, wordCount:4, part:6 },
+    { title: "Level 43: z x c v in triples", type:'combo',  keys:['z','x','c','v'], comboSize:3, wordCount:4, part:6 },
+    { title: "Level 44: z x c v mixed up",   type:'random', keys:['z','x','c','v'], length:16, part:6 },
+    { title: "Level 45: zxcv words",         type:'words',  words:['voice','carve','wave','quiz'], part:6 },
+    { title: "Level 46: b n m in a row",     type:'blocks', keys:['b','n','m'], repeat:4, part:7 },
+    { title: "Level 47: b & n",              type:'pair',   letters:['b','n'], wordLen:6, wordCount:4, part:7 },
     { title: "Level 48: n & m",              type:'pair',   letters:['n','m'], wordLen:6, wordCount:4, part:7 },
-    { title: "Level 49: full keyboard finale", type:'words', words:['ninja','magic','jungle','amazing'], part:7 }
+    { title: "Level 49: b & m",              type:'pair',   letters:['b','m'], wordLen:6, wordCount:4, part:7 },
+    { title: "Level 50: b n m in triples",   type:'combo',  keys:['b','n','m'], comboSize:3, wordCount:4, part:7 },
+    { title: "Level 51: b n m mixed up",     type:'random', keys:['b','n','m'], length:12, part:7 },
+    { title: "Level 52: full keyboard finale", type:'words', words:['ninja','magic','jungle','amazing'], part:7 }
   ];
 
   const cheer = ["Great job!", "Awesome!", "You got it!", "Super!", "Nice typing!", "Woohoo!"];
